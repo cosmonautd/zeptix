@@ -42,7 +42,7 @@
                     "PUSH R0    \n\t" \
                     );
 
-#define SP_BACKUP(dest) (dest = (void *) SP)
+#define SP_BACKUP(dest) (dest = SP)
 
 #define CONTEXT_RESTORE() \
             asm( \
@@ -87,40 +87,43 @@
 #define TOTAL_TASKS 3
 int current_task = 0;
 int task_stack_size[TOTAL_TASKS];
-int* SP_backup_array[TOTAL_TASKS];
+int SP_backup_array[TOTAL_TASKS];
 
 ISR(TIMER0_OVF_vect, __attribute__((naked))) {
 
+    DDRB|= (1<<PORTB0);
+    PORTB^=(1<<PORTB0);
+    
     CONTEXT_BACKUP();
     SP_BACKUP(SP_backup_array[current_task]);
     
     if(current_task++==TOTAL_TASKS)
         current_task = 0;
     
-    SP_RESTORE(*SP_backup_array[current_task]);
+    SP_RESTORE(SP_backup_array[current_task]);
     CONTEXT_RESTORE();
     
     asm volatile ("reti");
 }
 
 void task0(void){
-    DDRB|= (1<<PORTB0);
+    DDRD|= (1<<PORTD5);
     while(1) {
-        PORTB^=(1<<PORTB0);
+        PORTD^=(1<<PORTD5);
     }
 }
 
 void task1(void){
-    DDRB|= (1<<PORTB1);
+    DDRD|= (1<<PORTD6);
     while(1) {
-        PORTB^=(1<<PORTB1);
+        PORTD^=(1<<PORTD6);
     }
 }
 
 void task2(void){
-    DDRB|= (1<<PORTB2);
+    DDRD|= (1<<PORTD7);
     while(1) {
-        PORTB^=(1<<PORTB2);
+        PORTD^=(1<<PORTD7);
     }
 }
 
@@ -135,7 +138,7 @@ void init(void) {
     task_pointer[1] = task1;
     task_pointer[2] = task2;
     
-    SP_backup_array[0] = (int*) RAMEND-50;
+    SP_backup_array[0] = (int) RAMEND-50;
     
     for(i=1; i < TOTAL_TASKS; i++)
         SP_backup_array[i] = SP_backup_array[i-1] - task_stack_size[i-1];
@@ -152,10 +155,10 @@ void init(void) {
         SP_backup_array[i]-=35;
     
     TIMSK = (1 << TOIE0);
-    TCCR0 = (1 << CS00) | (1 << CS02);
+    TCCR0 = (1 << CS02);// | (1 << CS02);
     TCNT0 = 0;
     
-    SP_RESTORE(*SP_backup_array[current_task]);
+    SP_RESTORE(SP_backup_array[current_task]);
     
     sei();
 }
@@ -163,5 +166,5 @@ void init(void) {
 main(void) {
     
     init();
-    while(1){}
+    task0();
 }
