@@ -17,8 +17,6 @@ struct Process {
 struct Process processes[TOTAL_TASKS];
 
 int current_task = 0;
-/*int task_stack_size[TOTAL_TASKS];
-int SP_backup_array[TOTAL_TASKS];*/
 
 ISR(TIMER0_OVF_vect, __attribute__((naked))) {
 
@@ -26,14 +24,12 @@ ISR(TIMER0_OVF_vect, __attribute__((naked))) {
     PORTB^=(1<<PORTB0);
 
     CONTEXT_BACKUP();
-    /*SP_BACKUP(SP_backup_array[current_task]);*/
     SP_BACKUP(processes[current_task].stack_pointer);
     
 
     if(current_task++==TOTAL_TASKS)
         current_task = 0;
 
-    /*SP_RESTORE(SP_backup_array[current_task]);*/
     SP_RESTORE(processes[current_task].stack_pointer);
     CONTEXT_RESTORE();
 
@@ -64,34 +60,20 @@ void task2(void){
 void init(void) {
 
     int i;
-    for(i=1; i < TOTAL_TASKS; i++){
-        /*task_stack_size[i] = 100;*/
+    for(i=1; i < TOTAL_TASKS; i++)
         processes[i].stack_size = 100;
-    }
-
-    /*void (*task_pointer[TOTAL_TASKS]);
-    task_pointer[0] = task0;
-    task_pointer[1] = task1;
-    task_pointer[2] = task2;*/
     
     processes[0].task_pointer = task0;
     processes[1].task_pointer = task1;
     processes[2].task_pointer = task2;
 
-    /*SP_backup_array[0] = (int) RAMEND-50;*/
     processes[0].stack_pointer = (int) RAMEND-50;
 
-    for(i=1; i < TOTAL_TASKS; i++) {
-        /*SP_backup_array[i] = SP_backup_array[i-1] - task_stack_size[i-1];*/
+    for(i=1; i < TOTAL_TASKS; i++)
         processes[i].stack_pointer = processes[i-1].stack_pointer - processes[i-1].stack_size;
-    }
 
     char *px;
     for(i=0; i < TOTAL_TASKS; i++) {
-        /*px = (char *) SP_backup_array[i];
-        *px = (char) ((int) task_pointer[i]);
-        px = (char *) SP_backup_array[i]-1;
-        *px = (char) (((int) task_pointer[i]) >> 8);*/
         px = (char *) processes[i].stack_pointer;
         *px = (char) ((int) processes[i].task_pointer);
         px = (char *) processes[i].stack_pointer-1;
@@ -99,16 +81,12 @@ void init(void) {
     }
 
     for(i=1; i < TOTAL_TASKS; i++) {
-        /*SP_backup_array[i]-=35;*/
         processes[i].stack_pointer-=35;
     }
 
     TIMSK = (1 << TOIE0);
     TCCR0 = (1 << CS00) | (1 << CS02);
     TCNT0 = 0;
-
-    /*SP_RESTORE(SP_backup_array[current_task]);*/
-    //SP_RESTORE(processes[current_task].stack_pointer);
 
     sei();
 }
