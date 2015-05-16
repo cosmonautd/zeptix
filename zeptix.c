@@ -3,18 +3,12 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
-#include "context.h"
+#include "modules/context.h"
+#include "algorithms/roundrobin.h"
 
 #define TOTAL_TASKS 3
 
-struct Process {
-   int  pid;
-   int  stack_size;
-   int  stack_pointer;
-   void *task_pointer;
-};  
-
-struct Process processes[TOTAL_TASKS];
+struct process processes[TOTAL_TASKS];
 
 int current_task = 0;
 
@@ -26,9 +20,7 @@ ISR(TIMER0_OVF_vect, __attribute__((naked))) {
     CONTEXT_BACKUP();
     SP_BACKUP(processes[current_task].stack_pointer);
     
-
-    if(current_task++==TOTAL_TASKS)
-        current_task = 0;
+    current_task = next_task(processes, TOTAL_TASKS);
 
     SP_RESTORE(processes[current_task].stack_pointer);
     CONTEXT_RESTORE();
@@ -60,8 +52,14 @@ void task2(void){
 void init(void) {
 
     int i;
-    for(i=1; i < TOTAL_TASKS; i++)
+    for(i=1; i < TOTAL_TASKS; i++) {
         processes[i].stack_size = 100;
+        processes[i].running = 0;
+    }
+    
+    processes[0].priority = 0;
+    processes[1].priority = 5;
+    processes[2].priority = 5;
     
     processes[0].task_pointer = task0;
     processes[1].task_pointer = task1;
@@ -85,7 +83,7 @@ void init(void) {
     }
 
     TIMSK = (1 << TOIE0);
-    TCCR0 = (1 << CS00) | (1 << CS02);
+    TCCR0 = (1 << CS02);
     TCNT0 = 0;
 
     sei();
@@ -94,5 +92,6 @@ void init(void) {
 main(void) {
 
     init();
+    init_scheduler(processes, TOTAL_TASKS);
     task0();
 }
