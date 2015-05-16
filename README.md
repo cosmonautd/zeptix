@@ -1,2 +1,2 @@
 # zeptix
-A zepto OS for ATmega.
+A tiny task scheduler for ATmega8.
