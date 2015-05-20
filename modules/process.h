@@ -4,5 +4,6 @@ struct process {
    int  stack_pointer;
    void *task_pointer;
    int running;
+   int finished;
    int priority;
 };
