@@ -18,7 +18,7 @@
 
 /* Vetor de estruturas process
 */
-struct process processes[TOTAL_TASKS+1];
+struct process processes[TOTAL_TASKS];
 
 /* Marcador da atual tarefa sendo executada
 */
@@ -42,7 +42,7 @@ ISR(TIMER0_OVF_vect, __attribute__((naked))) {
     /* Carrega o índice da próxima tarefa a ser executada
        Chama a função next_task(), definida no código do algoritmo de escalonamento utilizado
     */
-    current_task = next_task(processes, TOTAL_TASKS+1);
+    current_task = next_task(processes, TOTAL_TASKS);
 
     /* Carrega o valor de SP com o valor de SP do próximo processo
        Restaura o contexto do próximo processo
@@ -72,7 +72,7 @@ void init(void) {
     /* Inicializa o escalonador de processos
        Preenche a PCB para todos os processos
     */
-    init_scheduler(processes, TOTAL_TASKS+1, RAMEND);
+    init_scheduler(processes, TOTAL_TASKS, RAMEND);
 
     /* Configura a interrupção por overflow do TIMER0
        Seta bit para habilitação dessa interrupção
