@@ -62,7 +62,7 @@ int next_task(struct process* list, int size) {
     for(i=0; i < size; i++)
         if(list[i].running) break;
     
-    if(i>=size) {
+    if(i>=(size - 1)) {
         i = 0;
         list[i].running = 1;
     } else {
