@@ -31,7 +31,7 @@ ISR(TIMER0_OVF_vect, __attribute__((naked))) {
     /* Muda o estado de um LED em PORTB0
     */
     DDRB|= (1<<PORTB0);
-    PORTB^=(1<<PORTB0);
+    PORTB =(1<<PORTB0);
 
     /* Salva o contexto do processo na pilha do programa atual
        Guarda o valor de SP (Stack Pointer) na PCB (Process Control Block) do processo atual
@@ -55,6 +55,8 @@ ISR(TIMER0_OVF_vect, __attribute__((naked))) {
     UART_TX(current_task);
     asm volatile ("nop");
 
+    PORTB =(0<<PORTB0);
+    
     /* Retorna da interrupção
        Inicia a execução do próximo processo
     */
