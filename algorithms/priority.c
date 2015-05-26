@@ -8,7 +8,7 @@ void init_scheduler(struct process* list, int size, int ramend) {
         list[i].stack_size = 100;
         list[i].running = 0;
     }
-    
+
     list[0].task_pointer = task0;
     list[1].task_pointer = task1;
     list[2].task_pointer = task2;
@@ -33,9 +33,9 @@ void init_scheduler(struct process* list, int size, int ramend) {
 }
 
 int next_task(struct process* list, int size) {
-    
+
     int i = 3;
     list[i].running = 1;
-    
+
     return i;
 }

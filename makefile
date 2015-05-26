@@ -20,4 +20,4 @@ load: zeptix.hex
 
 # Erase all object, hex and backup files
 clean:
-	rm -rf *.o *.hex *~
+	rm -rf *.o *.hex *~ */*.o */*.hex */*~

@@ -38,7 +38,7 @@ ISR(TIMER0_OVF_vect, __attribute__((naked))) {
     */
     CONTEXT_BACKUP();
     SP_BACKUP(processes[current_task].stack_pointer);
-    
+
     /* Carrega o índice da próxima tarefa a ser executada
        Chama a função next_task(), definida no código do algoritmo de escalonamento utilizado
     */
@@ -49,14 +49,14 @@ ISR(TIMER0_OVF_vect, __attribute__((naked))) {
     */
     SP_RESTORE(processes[current_task].stack_pointer);
     CONTEXT_RESTORE();
-    
+
     /* Transmite via serial o índice da próxima tarefa a ser executada
     */
     UART_TX(current_task);
     asm volatile ("nop");
 
     PORTB =(0<<PORTB0);
-    
+
     /* Retorna da interrupção
        Inicia a execução do próximo processo
     */
@@ -70,7 +70,7 @@ void init(void) {
     /* Inicializa UART
     */
     UART_INIT();
-    
+
     /* Inicializa o escalonador de processos
        Preenche a PCB para todos os processos
     */
@@ -84,11 +84,11 @@ void init(void) {
     TIMSK = (1 << TOIE0);
     TCCR0 = (1 << CS02);
     TCNT0 = 0;
-    
+
     /* Transmite o valor 255, sinalizando o término da inicialização
     */
     UART_TX(255);
-    
+
     /* Habilita interrupção global
     */
     sei();

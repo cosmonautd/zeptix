@@ -14,7 +14,7 @@ void init_scheduler(struct process* list, int size, int ramend) {
         list[i].stack_size = 100;
         list[i].running = 0;
     }
-    
+
     /* Associa a cada processo um conjunto de instruções armazenadas dentro de uma função
        Isso significa que o código associado ao processo 0 é definido na função task0
        O código associado ao processo 1 é definido na função task1 e assim por diante...
@@ -61,7 +61,7 @@ int next_task(struct process* list, int size) {
     int i;
     for(i=0; i < size; i++)
         if(list[i].running) break;
-    
+
     if(i>=size - 1) {
         list[i].running = 0;
         i = 0;
@@ -70,6 +70,6 @@ int next_task(struct process* list, int size) {
         list[i].running = 0;
         list[++i].running = 1;
     }
-    
+
     return i;
 }
