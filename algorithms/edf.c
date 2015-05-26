@@ -25,10 +25,10 @@ void init_scheduler(struct process* list, int size, int ramend) {
     list[2].task_pointer = task2;
     list[3].task_pointer = task3;
     
-    list[0].deadline = 1;
-    list[1].deadline = 5;
+    list[0].deadline = -1;
+    list[1].deadline = 20;
     list[2].deadline = 10;
-    list[3].deadline = 0;
+    list[3].deadline = 50;
 
     /* O endereço da pilha do processo 0 é 100 bytes abaixo do último endereço na SRAM
      */
@@ -66,13 +66,14 @@ int next_task(struct process* list, int size) {
     
     int i, j, k, closer_deadline, aux_closer_deadline, deadline_last_process_executed, aux_last_process_executed;
     
-    aux_closer_deadline = list[0].deadline;
+    aux_closer_deadline = 1000000;
     
-    for (j=0; j < size; j++)
+    for (j = 0; j < size; j++){
         if(list[j].running){
             list[j].running = 0;
             aux_last_process_executed = j;
         }
+    }
     
     deadline_last_process_executed = list[aux_last_process_executed].deadline;
     list[aux_last_process_executed].deadline = -1;
@@ -81,12 +82,14 @@ int next_task(struct process* list, int size) {
      Como esse processo já vai ser exetuado, seu deadline é subtraido em 1.
      Fica entendido que deadline -1 é infinito, ainda não foi implementado. 
      */
-    for (j = 0; j < size; j++)
-        if (list[j].deadline >= 0)
-            if (list[j].deadline < aux_closer_deadline){
+    for (j = 0; j < size; j++){
+        if (list[j].deadline >= 0){
+            if (list[j].deadline <= aux_closer_deadline && list[j].deadline != -1){
                 aux_closer_deadline = list[j].deadline;
                 closer_deadline = j;
             }
+        }
+    }
     
     list[closer_deadline].deadline--;
     list[closer_deadline].running = 1;
