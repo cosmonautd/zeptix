@@ -4,7 +4,7 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include "modules/context.h"
-#include "algorithms/roundrobin.h"
+#include "algorithms/priority.h"
 
 /* Definição de macros para inicialização e transmissão serial UART.
    baudrate: 2400, bytesize: 8, paridade: ímpar, stopbits: 2
