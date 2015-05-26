@@ -1,6 +1,6 @@
 MCU=atmega8
 CFLAGS=-mmcu=$(MCU) -Os
-SRC=zeptix.c tasks.c algorithms/priority.c
+SRC=zeptix.c tasks.c algorithms/roundrobin.c
 
 # Generate hex file for zeptix.
 zeptix.hex: zeptix.o
