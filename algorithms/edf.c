@@ -28,7 +28,7 @@ void init_scheduler(struct process* list, int size, int ramend) {
     list[0].deadline = -1;
     list[1].deadline = 20;
     list[2].deadline = 10;
-    list[3].deadline = 50;
+    list[3].deadline = 40;
 
     /* O endereço da pilha do processo 0 é 100 bytes abaixo do último endereço na SRAM
      */
