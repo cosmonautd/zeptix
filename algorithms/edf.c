@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "lottery.h"
+#include "edf.h"
 #include "../tasks.h"
 
 /* Função de inicialização do escalonador
@@ -25,10 +25,10 @@ void init_scheduler(struct process* list, int size, int ramend) {
     list[2].task_pointer = task2;
     list[3].task_pointer = task3;
     
-    list[0].lottery_cards = 1;
-    list[1].lottery_cards = 100;
-    list[2].lottery_cards = 10;
-    list[3].lottery_cards = 400;
+    list[0].deadline = 1;
+    list[1].deadline = 5;
+    list[2].deadline = 10;
+    list[3].deadline = 0;
 
     /* O endereço da pilha do processo 0 é 100 bytes abaixo do último endereço na SRAM
      */
@@ -64,32 +64,34 @@ void init_scheduler(struct process* list, int size, int ramend) {
  */
 int next_task(struct process* list, int size) {
     
-    int i, j, sum_card = 0, alleatory, process_select, aux = 0;
+    int i, j, k, closer_deadline, aux_closer_deadline, deadline_last_process_executed, aux_last_process_executed;
     
-    for(j=0; j < size; j++)
-        if(list[j].running)
+    aux_closer_deadline = list[0].deadline;
+    
+    for (j=0; j < size; j++)
+        if(list[j].running){
             list[j].running = 0;
+            aux_last_process_executed = j;
+        }
     
-    // Defini o tamanho da roleta
+    deadline_last_process_executed = list[aux_last_process_executed].deadline;
+    list[aux_last_process_executed].deadline = -1;
+    
+    /* Encontra o menor deadline e define que ele deve ser executado.
+     Como esse processo já vai ser exetuado, seu deadline é subtraido em 1.
+     Fica entendido que deadline -1 é infinito, ainda não foi implementado. 
+     */
     for (j = 0; j < size; j++)
-        sum_card += list[j].lottery_cards;
+        if (list[j].deadline >= 0)
+            if (list[j].deadline < aux_closer_deadline){
+                aux_closer_deadline = list[j].deadline;
+                closer_deadline = j;
+            }
     
-    // Card aleatorio gerado
-    alleatory = (rand() % sum_card) + 1;
+    list[closer_deadline].deadline--;
+    list[closer_deadline].running = 1;
     
-    process_select = -1;
+    list[aux_last_process_executed].deadline = deadline_last_process_executed;
     
-    // Na loteria encontra o processo dono do card gerado
-    while (1){
-        process_select++;
-        aux += list[process_select].lottery_cards;
-        if (aux >= alleatory)
-            break;
-    }
-    
-    i = process_select;
-    
-    list[process_select].running = 1;
-    
-    return process_select;
+    return closer_deadline;
 }

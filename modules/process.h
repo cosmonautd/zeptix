@@ -6,5 +6,6 @@ struct process {
     int running;
     int finished;
     int priority;
-    double lottery_cards;
+    int lottery_cards;
+    int deadline;
 };
