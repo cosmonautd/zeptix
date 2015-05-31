@@ -39,7 +39,7 @@ void init_scheduler(struct process* list, int size, int ramend) {
 
 int next_task(struct process* list, int size) {
 
-    ///*Variáveis que armazenarão o valor da maior prioridade
+    /*Variáveis que armazenarão o valor da maior prioridade
        encontrada entre os processos e o índice do processo
        com com maior prioridade */
     int greatest_priority = 0;
