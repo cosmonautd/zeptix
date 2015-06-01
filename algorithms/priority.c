@@ -67,7 +67,7 @@ int next_task(struct process* list, int size) {
     }
     
     /*Implementação da técnica de envelhecimento*/
-    for(i=0; i < size; i++)
+    for(i=1; i < size; i++)
         if(list[i].priority < greatest_priority)
             list[i].priority++;
 
