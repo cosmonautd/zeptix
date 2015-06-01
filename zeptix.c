@@ -4,7 +4,7 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include "modules/context.h"
-#include "algorithms/lottery.h"
+#include "algorithms/edf.h"
 
 /* Definição de macros para inicialização e transmissão serial UART.
    baudrate: 2400, bytesize: 8, paridade: ímpar, stopbits: 2
@@ -43,6 +43,8 @@ ISR(TIMER0_OVF_vect, __attribute__((naked))) {
        Chama a função next_task(), definida no código do algoritmo de escalonamento utilizado
     */
     current_task = next_task(processes, TOTAL_TASKS);
+    
+    if(current_task == -1) while(1){};
 
     /* Carrega o valor de SP com o valor de SP do próximo processo
        Restaura o contexto do próximo processo
