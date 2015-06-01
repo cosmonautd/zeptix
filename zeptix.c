@@ -4,7 +4,7 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include "modules/context.h"
-#include "algorithms/edf.h"
+#include "algorithms/priority.h"
 
 /* Definição de macros para inicialização e transmissão serial UART.
    baudrate: 2400, bytesize: 8, paridade: ímpar, stopbits: 2
@@ -103,5 +103,6 @@ main(void) {
     /* Inicialização
     */
     init();
+    SP_RESTORE(processes[0].stack_pointer);
     task0();
 }

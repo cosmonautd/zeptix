@@ -1,6 +1,9 @@
 #define CONTEXT_BACKUP() \
             asm( \
                     "PUSH R0    \n\t" \
+                    "IN   R0,__SREG__  \n\t" \
+                    "PUSH R0    \n\t" \
+                    "CLR  R1    \n\t" \
                     "PUSH R1    \n\t" \
                     "PUSH R2    \n\t" \
                     "PUSH R3    \n\t" \
@@ -31,16 +34,12 @@
                     "PUSH R28   \n\t" \
                     "PUSH R29   \n\t" \
                     "PUSH R30   \n\t" \
-                    "PUSH R31   \n\t" \
-                    "IN R0,0x3F \n\t" \
-                    "PUSH R0    \n\t" );
+                    "PUSH R31   \n\t" );
 
 #define SP_BACKUP(dest) (dest = SP)
 
 #define CONTEXT_RESTORE() \
             asm( \
-                    "POP R0      \n\t" \
-                    "OUT 0x3F,R0 \n\t" \
                     "POP R31     \n\t" \
                     "POP R30     \n\t" \
                     "POP R29     \n\t" \
@@ -72,6 +71,8 @@
                     "POP R3      \n\t" \
                     "POP R2      \n\t" \
                     "POP R1      \n\t" \
+                    "POP R0      \n\t" \
+                    "OUT __SREG__,R0 \n\t" \
                     "POP R0      \n\t" );
 
 #define SP_RESTORE(value) (SP = (int) (value))

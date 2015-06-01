@@ -15,9 +15,9 @@ void init_scheduler(struct process* list, int size, int ramend) {
     list[3].task_pointer = task3;
 
     list[0].priority = 0;
-    list[1].priority = 11;
-    list[2].priority = 11;
-    list[3].priority = 12;
+    list[1].priority = 10;
+    list[2].priority = 150;
+    list[3].priority = 512;
 
     list[0].stack_pointer = (int) ramend-100;
 
@@ -65,6 +65,11 @@ int next_task(struct process* list, int size) {
             greatest_priority_index = j;
         }
     }
+    
+    /*Implementação da técnica de envelhecimento*/
+    for(i=0; i < size; i++)
+        if(list[i].priority < greatest_priority)
+            list[i].priority++;
 
     /*Declara o próximo processo a ser executado e retorna
     seu índice*/
