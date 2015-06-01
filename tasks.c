@@ -41,13 +41,11 @@ void task3(void){
         }
         
         if( i >= 256){
-            //i = 0;
             while(i > 0){
-            OCR1A = i;
-            _delay_ms(3);
-            i--;
+                OCR1A = i;
+                _delay_ms(3);
+                i--;
             }  
         }
-        
     }
 }
