@@ -25,10 +25,10 @@ void init_scheduler(struct process* list, int size, int ramend) {
     list[2].task_pointer = task2;
     list[3].task_pointer = task3;
     
-    list[0].deadline = -1;
-    list[1].deadline = 20;
-    list[2].deadline = 10;
-    list[3].deadline = 40;
+    list[0].deadline = 0;
+    list[1].deadline = 99;
+    list[2].deadline = 494;
+    list[3].deadline = 1495;
 
     /* O endereço da pilha do processo 0 é 100 bytes abaixo do último endereço na SRAM
      */
@@ -64,10 +64,18 @@ void init_scheduler(struct process* list, int size, int ramend) {
  */
 int next_task(struct process* list, int size) {
     
-    int i, j, k, closer_deadline, aux_closer_deadline, deadline_last_process_executed, aux_last_process_executed;
+    int j, i = 0, closer_deadline = -1, aux_closer_deadline, deadline_last_process_executed, aux_last_process_executed;
     
     aux_closer_deadline = 1000000;
     
+    // Subtrai o deadline em todos os processos e sinaliza os finalizados
+    for (j = 0; j < size; j++){
+        list[j].deadline--;
+        if(list[j].deadline <= 0)
+            list[j].finished = 1;
+    }
+    
+    // Verifica qual processo está sendo executado anteriormente
     for (j = 0; j < size; j++){
         if(list[j].running){
             list[j].running = 0;
@@ -75,26 +83,25 @@ int next_task(struct process* list, int size) {
         }
     }
     
-    deadline_last_process_executed = list[aux_last_process_executed].deadline;
-    list[aux_last_process_executed].deadline = -1;
-    
-    /* Encontra o menor deadline e define que ele deve ser executado.
-     Como esse processo já vai ser exetuado, seu deadline é subtraido em 1.
-     Fica entendido que deadline -1 é infinito, ainda não foi implementado. 
-     */
-    for (j = 0; j < size; j++){
-        if (list[j].deadline >= 0){
-            if (list[j].deadline <= aux_closer_deadline && list[j].deadline != -1){
-                aux_closer_deadline = list[j].deadline;
-                closer_deadline = j;
+    // Variável i armazena quantos processos já foram finalizados
+    for (j = 0; j < size; j++)
+        if(list[j].finished == 1)
+            i++;
+
+    // Se existir somente um processo para ser executado, deve ser executado novamente
+    if(i == size - 1)
+        closer_deadline = aux_last_process_executed;
+    else // Senão escolhe o proximo processo com o menor tempo para ser executado
+        for (j = 0; j < size; j++){
+            if (list[j].deadline > 0){
+                if (list[j].deadline <= aux_closer_deadline && list[j].finished == 0 && j != aux_last_process_executed){
+                    aux_closer_deadline = list[j].deadline;
+                    closer_deadline = j;
+                }
             }
-        }
-    }
-    
-    list[closer_deadline].deadline--;
+        }   
+        
     list[closer_deadline].running = 1;
-    
-    list[aux_last_process_executed].deadline = deadline_last_process_executed;
     
     return closer_deadline;
 }
