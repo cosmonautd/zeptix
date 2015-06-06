@@ -26,9 +26,9 @@ void init_scheduler(struct process* list, int size, int ramend) {
     list[3].task_pointer = task3;
     
     list[0].deadline = 0;
-    list[1].deadline = 99;
-    list[2].deadline = 494;
-    list[3].deadline = 1495;
+    list[1].deadline = 4;
+    list[2].deadline = 10;
+    list[3].deadline = 20;
 
     /* O endereço da pilha do processo 0 é 100 bytes abaixo do último endereço na SRAM
      */
@@ -69,8 +69,7 @@ int next_task(struct process* list, int size) {
     aux_closer_deadline = 1000000;
     
     // Subtrai o deadline em todos os processos e sinaliza os finalizados
-    for (j = 0; j < size; j++){
-        list[j].deadline--;
+    for (j = 0; j < size; j++){       
         if(list[j].deadline <= 0)
             list[j].finished = 1;
     }
@@ -79,29 +78,23 @@ int next_task(struct process* list, int size) {
     for (j = 0; j < size; j++){
         if(list[j].running){
             list[j].running = 0;
-            aux_last_process_executed = j;
         }
     }
-    
-    // Variável i armazena quantos processos já foram finalizados
-    for (j = 0; j < size; j++)
-        if(list[j].finished == 1)
-            i++;
 
-    // Se existir somente um processo para ser executado, deve ser executado novamente
-    if(i == size - 1)
-        closer_deadline = aux_last_process_executed;
-    else // Senão escolhe o proximo processo com o menor tempo para ser executado
-        for (j = 0; j < size; j++){
-            if (list[j].deadline > 0){
-                if (list[j].deadline <= aux_closer_deadline && list[j].finished == 0 && j != aux_last_process_executed){
-                    aux_closer_deadline = list[j].deadline;
-                    closer_deadline = j;
-                }
+    for (j = 0; j < size; j++){
+        if (list[j].deadline > 0){
+            if (list[j].deadline <= aux_closer_deadline && list[j].finished == 0){
+                aux_closer_deadline = list[j].deadline;
+                closer_deadline = j;
             }
-        }   
+        }
+    }   
         
     list[closer_deadline].running = 1;
+    
+    for (j = 0; j < size; j++){       
+        list[j].deadline--;
+    }
     
     return closer_deadline;
 }
